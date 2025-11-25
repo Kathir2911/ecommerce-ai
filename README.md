@@ -1,70 +1,81 @@
-# Getting Started with Create React App
+# Ecommerce AI + Flipkart Affiliate Feed
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+React front-end + Node/Express backend that surfaces realtime product data from Flipkart’s Affiliate Product Feed API while keeping the AI shopping assistant UX from the original design. The frontend falls back to curated JSON if credentials are missing so you can develop without live API keys.
 
-## Available Scripts
+## Project structure
 
-In the project directory, you can run:
+```
+.
+├── backend/        # Express proxy that authenticates Flipkart API calls
+├── public/
+├── src/            # React app
+└── package.json
+```
 
-### `npm start`
+## Requirements
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+- Node 18+
+- Flipkart Affiliate ID + Token
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+## Backend setup
 
-### `npm test`
+1. Copy `backend/env.example` to `backend/.env` and fill in your keys:
+   ```
+   PORT=4000
+   CORS_ORIGINS=http://localhost:3000
+   FLIPKART_AFFILIATE_ID=yourAffiliateId
+   FLIPKART_AFFILIATE_TOKEN=yourAffiliateToken
+   FLIPKART_BASE_URL=https://affiliate-api.flipkart.net/affiliate/1.0
+   FLIPKART_RESULT_COUNT=12
+   FLIPKART_CURRENCY=INR
+   ```
+2. Install deps and start the server:
+   ```bash
+   cd backend
+   npm install
+   npm run dev
+   ```
+   The proxy exposes `GET /api/products?keywords=...` and forwards the request to Flipkart’s Affiliate search feed with the correct headers.
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+## Frontend setup
 
-### `npm run build`
+```bash
+cd /home/kathir/Documents/ecommerce-ai
+npm install
+npm start
+```
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+`package.json` is configured with `"proxy": "http://localhost:4000"`, so CRA automatically forwards `/api/*` calls to the backend during development. For production builds set `REACT_APP_API_BASE` to the deployed backend URL.
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+## Environment variables
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+Frontend:
 
-### `npm run eject`
+```bash
+# .env (optional)
+REACT_APP_API_BASE=https://your-backend.example.com
+REACT_APP_AI_KEY=sk-...
+```
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+Backend: see the `.env` snippet above. **Never** commit real keys; `.gitignore` already excludes `.env`.
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+## Development workflow
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+1. Run the backend: `npm run dev` inside `backend/`
+2. Run the frontend: `npm start` at the project root
+3. Visit `http://localhost:3000` to interact with live Flipkart data, filters, cart, and AI assistant.
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
+## Production build
 
-## Learn More
+```bash
+npm run build
+cd backend && npm start   # or deploy both services separately
+```
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+Serve the `build/` folder via any static host (Netlify, S3 + CloudFront, etc.) and point it at the deployed backend via `REACT_APP_API_BASE`.
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+## Troubleshooting
 
-### Code Splitting
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
-
-### Analyzing the Bundle Size
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
-
-### Making a Progressive Web App
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
-
-### Advanced Configuration
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+- **`react-scripts: not found`** – run `npm install` in the frontend root.
+- **Flipkart API errors** – verify your Affiliate ID/Token are correct and whitelisted.
+- **CORS issues** – add your frontend origin to `CORS_ORIGINS` in `backend/.env`.
