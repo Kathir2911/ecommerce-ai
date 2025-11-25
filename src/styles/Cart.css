@@ -1,0 +1,130 @@
+.cart-panel {
+  background: linear-gradient(160deg, rgba(13, 17, 42, 0.95), rgba(27, 29, 64, 0.9));
+  color: #f8fafc;
+  border-radius: 28px;
+  padding: 28px;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  box-shadow: 0 35px 70px rgba(2, 6, 23, 0.85);
+  min-width: 280px;
+  border: 1px solid rgba(99, 102, 241, 0.35);
+}
+
+.cart-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.cart-title {
+  margin: 0;
+  font-size: 1.25rem;
+  font-weight: 600;
+}
+
+.cart-clear {
+  background: rgba(148, 163, 184, 0.1);
+  border: 1px solid rgba(148, 163, 184, 0.3);
+  color: #e2e8f0;
+  border-radius: 999px;
+  padding: 4px 12px;
+  cursor: pointer;
+  font-size: 0.85rem;
+}
+
+.cart-items {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.cart-empty {
+  color: #cbd5f5;
+  margin: 0;
+}
+
+.cart-item {
+  background: rgba(255, 255, 255, 0.04);
+  border-radius: 20px;
+  padding: 14px 18px;
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  border: 1px solid rgba(148, 163, 184, 0.2);
+}
+
+.cart-item__name {
+  margin: 0;
+  font-weight: 600;
+}
+
+.cart-item__actions {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 8px;
+}
+
+.cart-quantity {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 999px;
+  padding: 4px 10px;
+}
+
+.cart-quantity button {
+  background: transparent;
+  border: none;
+  color: #f8fafc;
+  font-size: 1.25rem;
+  cursor: pointer;
+  padding: 0;
+}
+
+.cart-remove {
+  background: transparent;
+  border: none;
+  color: #f87171;
+  cursor: pointer;
+  font-size: 0.9rem;
+}
+
+.cart-summary {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 1.1rem;
+  color: #c7d2fe;
+}
+
+.cart-summary p {
+  margin: 0;
+  color: #94a3b8;
+}
+
+.cart-checkout {
+  width: 100%;
+  border: none;
+  border-radius: 18px;
+  padding: 16px 0;
+  font-size: 1rem;
+  font-weight: 600;
+  background: linear-gradient(120deg, #34d399, #22d3ee);
+  color: #0f172a;
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease, opacity 0.2s ease;
+}
+
+.cart-checkout:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.cart-checkout:not(:disabled):hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 24px rgba(79, 209, 197, 0.35);
+}
+

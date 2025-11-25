@@ -1,0 +1,90 @@
+[
+  {
+    "id": 1,
+    "name": "Wireless Headphones",
+    "price": 1999,
+    "category": "Electronics",
+    "brand": "SoundPulse",
+    "rating": 4.6,
+    "inStock": true,
+    "image": "https://images.unsplash.com/photo-1511367461989-f85a21fda167?auto=format&fit=crop&w=400&q=80",
+    "description": "Noise-cancelling over-ear headphones with 30 hours of battery life."
+  },
+  {
+    "id": 2,
+    "name": "Running Shoes",
+    "price": 1499,
+    "category": "Sports",
+    "brand": "FleetRun",
+    "rating": 4.2,
+    "inStock": true,
+    "image": "https://images.unsplash.com/photo-1523381210434-271e8be1f52b?auto=format&fit=crop&w=400&q=80",
+    "description": "Lightweight trainers with breathable mesh and responsive cushioning."
+  },
+  {
+    "id": 3,
+    "name": "Smart Watch",
+    "price": 9999,
+    "category": "Electronics",
+    "brand": "PulseTrack",
+    "rating": 4.8,
+    "inStock": true,
+    "image": "https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?auto=format&fit=crop&w=400&q=80",
+    "description": "AMOLED display, GPS, and 7-day battery life for workouts and calls."
+  },
+  {
+    "id": 4,
+    "name": "Espresso Machine",
+    "price": 12999,
+    "category": "Home",
+    "brand": "BrewMaster",
+    "rating": 4.4,
+    "inStock": false,
+    "image": "https://images.unsplash.com/photo-1509042239860-f550ce710b93?auto=format&fit=crop&w=400&q=80",
+    "description": "15-bar pump and built-in frother for coffee-shop drinks at home."
+  },
+  {
+    "id": 5,
+    "name": "Minimal Desk Lamp",
+    "price": 2499,
+    "category": "Home",
+    "brand": "NordicGlow",
+    "rating": 4.1,
+    "inStock": true,
+    "image": "https://images.unsplash.com/photo-1527430253228-e93688616381?auto=format&fit=crop&w=400&q=80",
+    "description": "Adjustable LED lamp with three color temperatures and USB charging."
+  },
+  {
+    "id": 6,
+    "name": "Travel Backpack",
+    "price": 3499,
+    "category": "Outdoors",
+    "brand": "TrailPro",
+    "rating": 4.5,
+    "inStock": true,
+    "image": "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=400&q=80",
+    "description": "35L weather-resistant pack with laptop sleeve and airflow back panel."
+  },
+  {
+    "id": 7,
+    "name": "Yoga Mat",
+    "price": 1299,
+    "category": "Sports",
+    "brand": "FlowState",
+    "rating": 4.0,
+    "inStock": true,
+    "image": "https://images.unsplash.com/photo-1599058917212-d750089bc07e?auto=format&fit=crop&w=400&q=80",
+    "description": "Non-slip mat with memory foam cushioning and carrying strap."
+  },
+  {
+    "id": 8,
+    "name": "4K Monitor",
+    "price": 24999,
+    "category": "Electronics",
+    "brand": "CrystalView",
+    "rating": 4.7,
+    "inStock": true,
+    "image": "https://images.unsplash.com/photo-1517336714731-489689fd1ca8?auto=format&fit=crop&w=400&q=80",
+    "description": "27-inch IPS panel, HDR400, and USB-C power delivery."
+  }
+]
