@@ -2,7 +2,7 @@
 
 A modern e-commerce application that aggregates real-time product data from **Flipkart** and **Amazon** using RapidAPI. It features an **AI Stylist** powered by Google Gemini to provide personalized shopping recommendations.
 
-![Project Screenshot](https://via.placeholder.com/800x400?text=Ecommerce+AI+Dashboard)
+![Project Screenshot](ecommerce-ai.png)
 
 ## 🚀 Features
 
