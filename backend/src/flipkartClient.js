@@ -3,59 +3,65 @@ import crypto from "node:crypto";
 import { flipkartConfig } from "./config.js";
 
 const normalizeProduct = (product) => {
-  const base = product?.productInfo?.productBaseInfoV1 ?? {};
-  const price =
-    base.flipkartSpecialPrice ??
-    base.flipkartSellingPrice ??
-    base.maximumRetailPrice ??
-    {};
-  const image =
-    base.imageUrls?.["800x800"] ||
-    base.imageUrls?.["400x400"] ||
-    base.imageUrls?.["200x200"] ||
-    "";
-
+  // RapidAPI returns different structure than affiliate API
   return {
-    id: base.productId ?? crypto.randomUUID?.() ?? `${Date.now()}`,
-    name: base.title ?? "Flipkart Product",
-    category: base.categoryPath?.split(">").pop()?.trim() ?? "Flipkart Catalog",
-    brand: base.productBrand ?? "Flipkart",
-    description: base.productDescription ?? "No description provided.",
-    image,
-    price: price.amount ?? 0,
-    currency: price.currency ?? flipkartConfig.currency,
-    rating: base.productRating ?? 0,
-    inStock: base.inStock ?? true,
-    url: base.productUrl
+    id: product?.id ?? product?.productId ?? crypto.randomUUID?.() ?? `${Date.now()}`,
+    name: product?.title ?? product?.name ?? "Flipkart Product",
+    category: product?.category ?? product?.categoryPath?.split(">").pop()?.trim() ?? "Flipkart Catalog",
+    brand: product?.brand ?? product?.productBrand ?? "Flipkart",
+    description: product?.description ?? product?.productDescription ?? "No description provided.",
+    image: product?.image ?? product?.imageUrl ?? product?.thumbnail ?? "",
+    price: product?.price ?? product?.currentPrice ?? product?.sellingPrice ?? 0,
+    currency: product?.currency ?? flipkartConfig.currency,
+    rating: product?.rating ?? product?.productRating ?? 0,
+    inStock: product?.inStock ?? product?.availability ?? true,
+    url: product?.url ?? product?.productUrl ?? product?.link ?? ""
   };
 };
 
 export const searchFlipkartItems = async ({
   keywords,
-  resultCount = flipkartConfig.defaultCount
+  resultCount = flipkartConfig.defaultCount,
+  categoryId = flipkartConfig.defaultCategoryId,
+  page = flipkartConfig.defaultPage
 }) => {
-  if (!flipkartConfig.affiliateId || !flipkartConfig.affiliateToken) {
+  if (!flipkartConfig.rapidApiKey) {
     throw new Error(
-      "Flipkart credentials missing. Provide FLIPKART_AFFILIATE_ID and FLIPKART_AFFILIATE_TOKEN."
+      "RapidAPI key missing. Provide RAPIDAPI_KEY in environment variables."
     );
   }
 
-  const url = new URL(`${flipkartConfig.baseUrl}/search.json`);
-  url.searchParams.append("query", keywords);
-  url.searchParams.append("resultCount", resultCount);
+  try {
+    const response = await axios.get(flipkartConfig.baseUrl, {
+      params: {
+        categoryID: categoryId,  // Note: RapidAPI uses categoryID (uppercase ID)
+        page: page
+      },
+      headers: {
+        "x-rapidapi-key": flipkartConfig.rapidApiKey,
+        "x-rapidapi-host": flipkartConfig.rapidApiHost
+      }
+    });
 
-  const response = await axios.get(url.toString(), {
-    headers: {
-      "Fk-Affiliate-Id": flipkartConfig.affiliateId,
-      "Fk-Affiliate-Token": flipkartConfig.affiliateToken,
-      Accept: "application/json"
-    }
-  });
 
-  const items = response.data?.products ?? [];
-  return {
-    items: items.map(normalizeProduct),
-    raw: response.data
-  };
+    // Handle different possible response structures from RapidAPI
+    console.log("RapidAPI raw response:", JSON.stringify(response.data, null, 2));
+    const items = response.data?.data?.products ?? response.data?.products ?? [];
+
+    console.log(`Found ${Array.isArray(items) ? items.length : 0} items from RapidAPI`);
+
+    return {
+      items: Array.isArray(items) ? items.map(normalizeProduct) : [],
+      raw: response.data
+    };
+  } catch (error) {
+    console.error("RapidAPI Flipkart error:", error.response?.data ?? error.message);
+    throw new Error(
+      error.response?.data?.message ??
+      error.message ??
+      "Failed to fetch products from RapidAPI"
+    );
+  }
 };
+
 

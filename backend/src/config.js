@@ -3,13 +3,14 @@ import dotenv from "dotenv";
 dotenv.config();
 
 export const flipkartConfig = {
-  affiliateId: process.env.FLIPKART_AFFILIATE_ID ?? "",
-  affiliateToken: process.env.FLIPKART_AFFILIATE_TOKEN ?? "",
-  baseUrl:
-    process.env.FLIPKART_BASE_URL ??
-    "https://affiliate-api.flipkart.net/affiliate/1.0",
+  rapidApiKey: process.env.RAPIDAPI_KEY ?? "",
+  rapidApiHost: process.env.FLIPKART_RAPIDAPI_HOST ?? "flipkart-apis.p.rapidapi.com",
+  baseUrl: process.env.FLIPKART_RAPIDAPI_BASE_URL ?? "https://flipkart-apis.p.rapidapi.com/backend/rapidapi/category-products-list",
   defaultCount: Number(process.env.FLIPKART_RESULT_COUNT) || 12,
-  currency: process.env.FLIPKART_CURRENCY ?? "INR"
+  currency: process.env.FLIPKART_CURRENCY ?? "INR",
+  country: process.env.FLIPKART_RAPIDAPI_COUNTRY ?? "IN",
+  defaultCategoryId: process.env.FLIPKART_DEFAULT_CATEGORY_ID ?? "axc",
+  defaultPage: Number(process.env.FLIPKART_DEFAULT_PAGE) || 1
 };
 
 export const serverConfig = {
