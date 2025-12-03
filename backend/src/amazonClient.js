@@ -1,61 +1,76 @@
 import axios from "axios";
 import crypto from "node:crypto";
-import { flipkartConfig } from "./config.js";
+import { amazonConfig } from "./config.js";
 
 const normalizeProduct = (product) => {
-  const base = product?.productInfo?.productBaseInfoV1 ?? {};
-  const price =
-    base.flipkartSpecialPrice ??
-    base.flipkartSellingPrice ??
-    base.maximumRetailPrice ??
-    {};
-  const image =
-    base.imageUrls?.["800x800"] ||
-    base.imageUrls?.["400x400"] ||
-    base.imageUrls?.["200x200"] ||
-    "";
+  // Amazon RapidAPI field mapping
+  // Extract price - could be in ProductPrice, price, or other fields
+  const priceStr = product?.ProductPrice ?? product?.price ?? "0";
+  const priceNum = typeof priceStr === 'string' ? parseFloat(priceStr.replace(/[^0-9.]/g, '')) : priceStr;
 
   return {
-    id: base.productId ?? crypto.randomUUID?.() ?? `${Date.now()}`,
-    name: base.title ?? "Flipkart Product",
-    category: base.categoryPath?.split(">").pop()?.trim() ?? "Flipkart Catalog",
-    brand: base.productBrand ?? "Flipkart",
-    description: base.productDescription ?? "No description provided.",
-    image,
-    price: price.amount ?? 0,
-    currency: price.currency ?? flipkartConfig.currency,
-    rating: base.productRating ?? 0,
-    inStock: base.inStock ?? true,
-    url: base.productUrl
+    id: product?.ASIN ?? product?.asin ?? crypto.randomUUID?.() ?? `${Date.now()}`,
+    name: product?.ProductTitle ?? product?.title ?? "Amazon Product",
+    category: product?.CategoryName ?? product?.category ?? "Electronics",
+    brand: product?.Brand ?? product?.brand ?? "Amazon",
+    description: product?.ProductTitle ?? product?.description ?? "No description provided.",
+    image: product?.ProductImage ?? product?.productImage ?? product?.image ?? product?.thumbnail ?? "",
+    price: (priceNum || 0) * 84, // Convert USD to INR (approx rate)
+    currency: "INR",
+    rating: parseFloat(product?.ProductRating ?? product?.rating ?? 0),
+    inStock: product?.ProductAvailability !== "Out of Stock",
+    url: product?.ProductUrl ?? product?.productUrl ?? product?.url ?? "",
+    source: "Amazon"
   };
 };
 
-export const searchFlipkartItems = async ({
+export const searchAmazonProducts = async ({
   keywords,
-  resultCount = flipkartConfig.defaultCount
+  resultCount = amazonConfig.defaultCount,
+  country = amazonConfig.defaultCountry,
+  sort = amazonConfig.defaultSort,
+  page = 1
 }) => {
-  if (!flipkartConfig.affiliateId || !flipkartConfig.affiliateToken) {
+  if (!amazonConfig.rapidApiKey) {
     throw new Error(
-      "Flipkart credentials missing. Provide FLIPKART_AFFILIATE_ID and FLIPKART_AFFILIATE_TOKEN."
+      "RapidAPI key missing. Provide RAPIDAPI_KEY in environment variables."
     );
   }
 
-  const url = new URL(`${flipkartConfig.baseUrl}/search.json`);
-  url.searchParams.append("query", keywords);
-  url.searchParams.append("resultCount", resultCount);
+  try {
+    const response = await axios.get(amazonConfig.baseUrl, {
+      params: {
+        keyword: keywords,
+        country: country,
+        page: page,
+        sort: sort
+      },
+      headers: {
+        "x-rapidapi-key": amazonConfig.rapidApiKey,
+        "x-rapidapi-host": amazonConfig.rapidApiHost
+      }
+    });
 
-  const response = await axios.get(url.toString(), {
-    headers: {
-      "Fk-Affiliate-Id": flipkartConfig.affiliateId,
-      "Fk-Affiliate-Token": flipkartConfig.affiliateToken,
-      Accept: "application/json"
-    }
-  });
+    console.log("Amazon RapidAPI raw response:", JSON.stringify(response.data, null, 2));
 
-  const items = response.data?.products ?? [];
-  return {
-    items: items.map(normalizeProduct),
-    raw: response.data
-  };
+    // Amazon API returns products in 'details' array at top level
+    const items = response.data?.details ?? [];
+
+    console.log(`Found ${Array.isArray(items) ? items.length : 0} items from Amazon RapidAPI`);
+
+    // Limit results to requested count
+    const limitedItems = Array.isArray(items) ? items.slice(0, resultCount) : [];
+
+    return {
+      items: limitedItems.map(normalizeProduct),
+      raw: response.data
+    };
+  } catch (error) {
+    console.error("Amazon RapidAPI error:", error.response?.data ?? error.message);
+    throw new Error(
+      error.response?.data?.message ??
+      error.message ??
+      "Failed to fetch products from Amazon RapidAPI"
+    );
+  }
 };
-

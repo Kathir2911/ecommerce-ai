@@ -12,7 +12,9 @@ const Home = () => {
     categories,
     priceBounds,
     isLoading,
-    error
+    error,
+    loadMore,
+    hasMore
   } = useFlipkartProducts("future tech gadgets");
   const [filters, setFilters] = useState(() => ({
     query: "",
@@ -123,11 +125,10 @@ const Home = () => {
             </p>
           )}
           <div className="products-grid">
-            {isLoading && <p className="loading-state">Loading...</p>}
-            {!isLoading &&
-              sortedProducts.map((product) => (
-                <ProductCard key={product.id} product={product} />
-              ))}
+            {isLoading && products.length === 0 && <p className="loading-state">Loading...</p>}
+            {sortedProducts.map((product) => (
+              <ProductCard key={product.id} product={product} />
+            ))}
             {!isLoading && sortedProducts.length === 0 && (
               <div className="empty-state">
                 <p>No products match the selected filters.</p>
@@ -148,6 +149,27 @@ const Home = () => {
               </div>
             )}
           </div>
+          {hasMore && products.length > 0 && (
+            <div className="load-more-container" style={{ textAlign: "center", marginTop: "32px" }}>
+              <button
+                className="load-more-btn"
+                onClick={loadMore}
+                disabled={isLoading}
+                style={{
+                  padding: "12px 32px",
+                  background: "rgba(99, 102, 241, 0.2)",
+                  border: "1px solid rgba(99, 102, 241, 0.4)",
+                  color: "#a5b4fc",
+                  borderRadius: "999px",
+                  cursor: isLoading ? "wait" : "pointer",
+                  fontWeight: 600,
+                  transition: "all 0.2s"
+                }}
+              >
+                {isLoading ? "Loading more..." : "Load More Products"}
+              </button>
+            </div>
+          )}
         </main>
 
         <aside className="home-cart">

@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState, useCallback } from "react";
 import fallbackProducts from "../data/products.json";
 
 const API_BASE = process.env.REACT_APP_API_BASE ?? "";
@@ -12,13 +12,23 @@ const mapFlipkartItem = (item) => ({
   rating: item.rating ?? 0,
   inStock: item.inStock ?? true,
   image: item.image,
-  description: item.description ?? "No description available."
+  description: item.description ?? "No description available.",
+  source: item.source
 });
 
 export const useFlipkartProducts = (keywords = "smart gadgets") => {
-  const [products, setProducts] = useState(fallbackProducts);
+  const [products, setProducts] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [page, setPage] = useState(1);
+  const [hasMore, setHasMore] = useState(true);
+
+  // Reset state when keywords change
+  useEffect(() => {
+    setProducts([]);
+    setPage(1);
+    setHasMore(true);
+  }, [keywords]);
 
   useEffect(() => {
     const controller = new AbortController();
@@ -29,26 +39,35 @@ export const useFlipkartProducts = (keywords = "smart gadgets") => {
 
       try {
         const response = await fetch(
-          `${API_BASE}/api/products?keywords=${encodeURIComponent(keywords)}`,
+          `${API_BASE}/api/products?keywords=${encodeURIComponent(keywords)}&page=${page}&limit=12`,
           { signal: controller.signal }
         );
 
         if (!response.ok) {
-          throw new Error("Flipkart API request failed");
+          throw new Error("API request failed");
         }
 
         const data = await response.json();
-        const normalized = data.items?.map(mapFlipkartItem);
+        const normalized = data.items?.map(mapFlipkartItem) || [];
 
-        if (normalized?.length) {
-          setProducts(normalized);
+        if (normalized.length === 0) {
+          setHasMore(false);
+          if (page === 1) setProducts(fallbackProducts);
         } else {
-          setProducts(fallbackProducts);
+          setProducts(prev => {
+            // Filter out duplicates based on ID
+            const existingIds = new Set(prev.map(p => p.id));
+            const newProducts = normalized.filter(p => !existingIds.has(p.id));
+            return [...prev, ...newProducts];
+          });
         }
       } catch (err) {
         if (err.name !== "AbortError") {
+          console.error("Fetch error:", err);
           setError(err.message);
-          setProducts(fallbackProducts);
+          if (page === 1 && products.length === 0) {
+            setProducts(fallbackProducts);
+          }
         }
       } finally {
         setIsLoading(false);
@@ -58,7 +77,13 @@ export const useFlipkartProducts = (keywords = "smart gadgets") => {
     fetchProducts();
 
     return () => controller.abort();
-  }, [keywords]);
+  }, [keywords, page]);
+
+  const loadMore = useCallback(() => {
+    if (!isLoading && hasMore) {
+      setPage(prev => prev + 1);
+    }
+  }, [isLoading, hasMore]);
 
   const meta = useMemo(() => {
     if (!products.length) {
@@ -83,7 +108,8 @@ export const useFlipkartProducts = (keywords = "smart gadgets") => {
     isLoading,
     error,
     categories: meta.categories,
-    priceBounds: meta.priceBounds
+    priceBounds: meta.priceBounds,
+    loadMore,
+    hasMore
   };
 };
-

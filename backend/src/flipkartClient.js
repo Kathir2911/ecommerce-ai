@@ -15,7 +15,8 @@ const normalizeProduct = (product) => {
     currency: product?.currency ?? flipkartConfig.currency,
     rating: product?.rating ?? product?.productRating ?? 0,
     inStock: product?.inStock ?? product?.availability ?? true,
-    url: product?.url ?? product?.productUrl ?? product?.link ?? ""
+    url: product?.url ?? product?.productUrl ?? product?.link ?? "",
+    source: "Flipkart"
   };
 };
 
