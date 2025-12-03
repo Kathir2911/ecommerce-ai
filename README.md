@@ -1,81 +1,140 @@
-# Ecommerce AI + Flipkart Affiliate Feed
+# Ecommerce AI – Flipkart & Amazon Price Comparison (RapidAPI)
 
-React front-end + Node/Express backend that surfaces realtime product data from Flipkart’s Affiliate Product Feed API while keeping the AI shopping assistant UX from the original design. The frontend falls back to curated JSON if credentials are missing so you can develop without live API keys.
+A full-stack ecommerce app with a React front-end and Node/Express backend that lets users **compare product prices between Amazon and Flipkart**. Product data is fetched in real-time from both platforms using their endpoints via [RapidAPI](https://rapidapi.com/). The original AI shopping assistant experience is retained.
 
-## Project structure
+---
+
+## Features
+
+- 🔍 Compare prices for products from Amazon and Flipkart  
+- ⚡ Real-time data powered by RapidAPI  
+- 🤖 Integrated AI shopping assistant  
+- 🛒 Modern React-based frontend  
+- 🔒 Secure backend proxy for API calls  
+
+---
+
+## Project Structure
 
 ```
 .
-├── backend/        # Express proxy that authenticates Flipkart API calls
-├── public/
-├── src/            # React app
+├── backend/        # Express proxy for Amazon/Flipkart via RapidAPI
+├── public/         # Static assets for React app
+├── src/            # React app source code
 └── package.json
 ```
 
+---
+
 ## Requirements
 
-- Node 18+
-- Flipkart Affiliate ID + Token
+- Node.js 18+
+- RapidAPI keys for Amazon and Flipkart Shopping APIs  
+- (Optional) OpenAI API Key for AI assistant
 
-## Backend setup
+---
 
-1. Copy `backend/env.example` to `backend/.env` and fill in your keys:
+## Backend Setup
+
+1. **Set up your backend environment variables:**  
+   Copy the example .env file and add your RapidAPI credentials.
+   ```bash
+   cp backend/env.example backend/.env
+   # Then edit backend/.env and fill in:
+   # PORT=4000
+   # CORS_ORIGINS=http://localhost:3000
+   # RAPIDAPI_KEY=yourRapidAPIKey
+   # AMAZON_API_HOST=yourAmazonHost
+   # FLIPKART_API_HOST=yourFlipkartHost
    ```
-   PORT=4000
-   CORS_ORIGINS=http://localhost:3000
-   FLIPKART_AFFILIATE_ID=yourAffiliateId
-   FLIPKART_AFFILIATE_TOKEN=yourAffiliateToken
-   FLIPKART_BASE_URL=https://affiliate-api.flipkart.net/affiliate/1.0
-   FLIPKART_RESULT_COUNT=12
-   FLIPKART_CURRENCY=INR
-   ```
-2. Install deps and start the server:
+   > Make sure you are subscribed to Amazon and Flipkart APIs on RapidAPI.
+
+2. **Install dependencies & start the server:**
    ```bash
    cd backend
    npm install
    npm run dev
    ```
-   The proxy exposes `GET /api/products?keywords=...` and forwards the request to Flipkart’s Affiliate search feed with the correct headers.
+   The backend proxy exposes:
+   - `GET /api/products?keywords=...` to fetch and compare products from Amazon and Flipkart using RapidAPI.
 
-## Frontend setup
+---
+
+## Frontend Setup
 
 ```bash
-cd /home/kathir/Documents/ecommerce-ai
 npm install
 npm start
 ```
 
-`package.json` is configured with `"proxy": "http://localhost:4000"`, so CRA automatically forwards `/api/*` calls to the backend during development. For production builds set `REACT_APP_API_BASE` to the deployed backend URL.
+- The frontend uses Create React App and will forward `/api/*` requests to your backend (`http://localhost:4000`) in development.
+- For production, set `REACT_APP_API_BASE` to your live backend URL.
 
-## Environment variables
+---
 
-Frontend:
+## Environment Variables
 
-```bash
-# .env (optional)
+**Frontend (`.env`, optional):**
+```env
 REACT_APP_API_BASE=https://your-backend.example.com
 REACT_APP_AI_KEY=sk-...
 ```
 
-Backend: see the `.env` snippet above. **Never** commit real keys; `.gitignore` already excludes `.env`.
+**Backend:**  
+See `backend/.env` configuration above.  
+> ⚠️ **Never commit real credentials.** `.gitignore` already excludes `.env` files.
 
-## Development workflow
+---
 
-1. Run the backend: `npm run dev` inside `backend/`
-2. Run the frontend: `npm start` at the project root
-3. Visit `http://localhost:3000` to interact with live Flipkart data, filters, cart, and AI assistant.
+## Development Workflow
 
-## Production build
+1. Run the backend:
+   ```bash
+   cd backend
+   npm run dev
+   ```
+2. Run the frontend at the project root:
+   ```bash
+   npm start
+   ```
+3. Visit [http://localhost:3000](http://localhost:3000) to search and compare Amazon and Flipkart prices with AI assistant help.
 
-```bash
-npm run build
-cd backend && npm start   # or deploy both services separately
-```
+---
 
-Serve the `build/` folder via any static host (Netlify, S3 + CloudFront, etc.) and point it at the deployed backend via `REACT_APP_API_BASE`.
+## Production Build & Deployment
+
+1. Build the frontend:
+   ```bash
+   npm run build
+   ```
+2. Deploy `build/` to a static host (e.g., Vercel, Netlify, S3, etc.).
+3. Run/deploy the backend:
+   ```bash
+   cd backend
+   npm start
+   ```
+4. Set `REACT_APP_API_BASE` on the frontend to your backend’s deployment URL.
+
+---
 
 ## Troubleshooting
 
-- **`react-scripts: not found`** – run `npm install` in the frontend root.
-- **Flipkart API errors** – verify your Affiliate ID/Token are correct and whitelisted.
-- **CORS issues** – add your frontend origin to `CORS_ORIGINS` in `backend/.env`.
+- **react-scripts: not found**  
+  Run `npm install` in your project root.
+- **API errors**  
+  Check your RapidAPI credentials and selected endpoints for Amazon/Flipkart.
+- **CORS issues**  
+  Ensure your frontend URL is included in `CORS_ORIGINS` in `backend/.env`.
+
+---
+
+## Contributing
+
+Contributions, issues, and feature requests are welcome!  
+Feel free to open an issue or pull request.
+
+---
+
+## License
+
+This project is [MIT licensed](LICENSE).
