@@ -1,81 +1,133 @@
-# Ecommerce AI + Flipkart Affiliate Feed
+# Ecommerce AI - Multi-Source Shopping Assistant
 
-React front-end + Node/Express backend that surfaces realtime product data from Flipkart’s Affiliate Product Feed API while keeping the AI shopping assistant UX from the original design. The frontend falls back to curated JSON if credentials are missing so you can develop without live API keys.
+A modern e-commerce application that aggregates real-time product data from **Flipkart** and **Amazon** using RapidAPI. It features an **AI Stylist** powered by Google Gemini to provide personalized shopping recommendations.
 
-## Project structure
+![Project Screenshot](https://via.placeholder.com/800x400?text=Ecommerce+AI+Dashboard)
+
+## 🚀 Features
+
+- **Multi-Source Aggregation**: Fetches products from both Flipkart and Amazon simultaneously.
+- **AI Shopping Assistant**: "AI Stylist" powered by Gemini API helps users find products based on natural language queries.
+- **Real-time Currency Conversion**: Automatically converts Amazon prices (USD) to INR.
+- **Smart UI**:
+    - **Source Badges**: Distinct badges for Flipkart (Orange) and Amazon (Blue) products.
+    - **Modal Descriptions**: Clean, centered modal dialogs for product details.
+    - **Pagination**: "Load More" functionality to browse endless products.
+- **Responsive Design**: Fully responsive grid layout with glassmorphism effects.
+
+## 🛠️ Tech Stack
+
+- **Frontend**: React, CSS Modules, Context API
+- **Backend**: Node.js, Express
+- **APIs**: RapidAPI (Real-time Amazon Data, Flipkart Scraper), Google Gemini AI
+- **Deployment**: Vercel (Serverless)
+
+## 📋 Prerequisites
+
+- Node.js 18+
+- [RapidAPI Account](https://rapidapi.com/) (Subscribe to "Real-time Amazon Data" and "Flipkart Scraper")
+- [Google Gemini API Key](https://ai.google.dev/)
+
+## ⚙️ Local Setup
+
+### 1. Backend Setup
+
+The backend acts as a proxy to hide API keys and handle data normalization.
+
+1.  Navigate to the backend directory:
+    ```bash
+    cd backend
+    ```
+2.  Install dependencies:
+    ```bash
+    npm install
+    ```
+3.  Create a `.env` file based on `env.example` (or use the keys below):
+    ```env
+    PORT=4000
+    CORS_ORIGINS=http://localhost:3000
+    
+    # RapidAPI Configuration
+    RAPIDAPI_KEY=your_rapidapi_key
+    
+    # Flipkart API
+    FLIPKART_RAPIDAPI_HOST=flipkart-scraper-api.p.rapidapi.com
+    FLIPKART_RAPIDAPI_BASE_URL=https://flipkart-scraper-api.p.rapidapi.com/products/search
+    
+    # Amazon API
+    AMAZON_RAPIDAPI_HOST=realtime-amazon-data.p.rapidapi.com
+    AMAZON_RAPIDAPI_BASE_URL=https://realtime-amazon-data.p.rapidapi.com/product-search
+    ```
+4.  Start the server:
+    ```bash
+    npm run dev
+    ```
+
+### 2. Frontend Setup
+
+1.  Navigate to the project root:
+    ```bash
+    cd ..
+    ```
+2.  Install dependencies:
+    ```bash
+    npm install
+    ```
+3.  Create a `.env` file in the root:
+    ```env
+    REACT_APP_API_BASE=http://localhost:4000
+    REACT_APP_AI_KEY=your_gemini_api_key
+    ```
+4.  Start the React app:
+    ```bash
+    npm start
+    ```
+5.  Open [http://localhost:3000](http://localhost:3000) to view the app.
+
+## ☁️ Deployment (Vercel)
+
+This project is configured for easy deployment on Vercel.
+
+### Backend Deployment
+1.  Push your code to GitHub.
+2.  Import the project in Vercel.
+3.  Select **Root Directory** as `backend`.
+4.  Add Environment Variables (`RAPIDAPI_KEY`, etc.) from your backend `.env`.
+5.  Deploy.
+
+### Frontend Deployment
+1.  Import the project in Vercel (create a **new** project).
+2.  Leave **Root Directory** as `./`.
+3.  Add Environment Variables:
+    - `REACT_APP_API_BASE`: Your deployed backend URL (e.g., `https://your-backend.vercel.app`)
+    - `REACT_APP_AI_KEY`: Your Gemini API Key
+4.  Deploy.
+
+## 📂 Project Structure
 
 ```
 .
-├── backend/        # Express proxy that authenticates Flipkart API calls
-├── public/
-├── src/            # React app
-└── package.json
+├── backend/                # Node.js/Express Backend
+│   ├── api/                # Vercel Serverless Entry Point
+│   ├── src/
+│   │   ├── routes/         # API Routes
+│   │   ├── amazonClient.js # Amazon API Logic
+│   │   ├── flipkartClient.js # Flipkart API Logic
+│   │   └── app.js          # Express App Setup
+│   └── vercel.json         # Backend Vercel Config
+├── src/                    # React Frontend
+│   ├── components/         # UI Components (ProductCard, Home, etc.)
+│   ├── hooks/              # Custom Hooks (useFlipkartProducts)
+│   └── styles/             # CSS Styles
+├── public/                 # Static Assets
+├── vercel.json             # Frontend Vercel Config
+└── README.md               # Documentation
 ```
 
-## Requirements
+## 🤝 Contributing
 
-- Node 18+
-- Flipkart Affiliate ID + Token
+Contributions are welcome! Please open an issue or submit a pull request.
 
-## Backend setup
+## 📄 License
 
-1. Copy `backend/env.example` to `backend/.env` and fill in your keys:
-   ```
-   PORT=4000
-   CORS_ORIGINS=http://localhost:3000
-   FLIPKART_AFFILIATE_ID=yourAffiliateId
-   FLIPKART_AFFILIATE_TOKEN=yourAffiliateToken
-   FLIPKART_BASE_URL=https://affiliate-api.flipkart.net/affiliate/1.0
-   FLIPKART_RESULT_COUNT=12
-   FLIPKART_CURRENCY=INR
-   ```
-2. Install deps and start the server:
-   ```bash
-   cd backend
-   npm install
-   npm run dev
-   ```
-   The proxy exposes `GET /api/products?keywords=...` and forwards the request to Flipkart’s Affiliate search feed with the correct headers.
-
-## Frontend setup
-
-```bash
-cd /home/kathir/Documents/ecommerce-ai
-npm install
-npm start
-```
-
-`package.json` is configured with `"proxy": "http://localhost:4000"`, so CRA automatically forwards `/api/*` calls to the backend during development. For production builds set `REACT_APP_API_BASE` to the deployed backend URL.
-
-## Environment variables
-
-Frontend:
-
-```bash
-# .env (optional)
-REACT_APP_API_BASE=https://your-backend.example.com
-REACT_APP_AI_KEY=sk-...
-```
-
-Backend: see the `.env` snippet above. **Never** commit real keys; `.gitignore` already excludes `.env`.
-
-## Development workflow
-
-1. Run the backend: `npm run dev` inside `backend/`
-2. Run the frontend: `npm start` at the project root
-3. Visit `http://localhost:3000` to interact with live Flipkart data, filters, cart, and AI assistant.
-
-## Production build
-
-```bash
-npm run build
-cd backend && npm start   # or deploy both services separately
-```
-
-Serve the `build/` folder via any static host (Netlify, S3 + CloudFront, etc.) and point it at the deployed backend via `REACT_APP_API_BASE`.
-
-## Troubleshooting
-
-- **`react-scripts: not found`** – run `npm install` in the frontend root.
-- **Flipkart API errors** – verify your Affiliate ID/Token are correct and whitelisted.
-- **CORS issues** – add your frontend origin to `CORS_ORIGINS` in `backend/.env`.
+MIT
